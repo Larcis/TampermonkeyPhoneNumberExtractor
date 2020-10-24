@@ -12,9 +12,9 @@
 
 (function() {
     'use strict';
-    let INTERVAL = 1300;
+    let INTERVAL = 1400;
     let CURRENT_CHAT = 0;
-
+    let already_seen_chats = {};
     //var phone_number_regex = /\+?(\d\s*){10,14}/g;
     var phone_number_regex = /(\+90|0)?\s*[5](\d\s*){9}/g;
     var contact_list = {};
@@ -41,8 +41,10 @@
             }
         }
         let matched_numbers = str.match(phone_number_regex);
+        let name = document.getElementsByClassName("_7UhW9 vy6Bb qyrsm KV-D4 fDxYl")[0].innerText
+        already_seen_chats[name] = 1;
         if(matched_numbers && matched_numbers.length > 0){
-            contact_list[document.getElementsByClassName("_7UhW9 vy6Bb qyrsm KV-D4 fDxYl")[0].innerText] = matched_numbers;
+            contact_list[name] = matched_numbers;
         }
     }
 
@@ -129,16 +131,20 @@
         document.body.removeChild(element);
     }
     function main(){
-        if(scrollToTop()){
-            queryChat();
+        let name = document.getElementsByClassName("_7UhW9 vy6Bb qyrsm KV-D4 fDxYl")[0].innerText;
+        if(already_seen_chats[name]){
             let chats = document.getElementsByClassName("N9abW")[0].firstElementChild.children;
             CURRENT_CHAT++;
             if(CURRENT_CHAT == chats.length-1){
+                let elem = document.getElementsByClassName("N9abW")[0];
+                elem.scrollTo(0, elem.scrollHeight);
                 CURRENT_CHAT = 0;
-                clearInterval(main_interv);
-            } else {
+            }
+            chats[CURRENT_CHAT].firstElementChild.click();
+        }else{
+            if(scrollToTop()){
+                queryChat();
                 ReactDOM.render(e('dl', null, ...contactsToListItem(contact_list)), ui_div);
-                chats[CURRENT_CHAT].firstElementChild.click();
             }
         }
     }
